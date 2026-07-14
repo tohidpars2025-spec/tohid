@@ -203,14 +203,14 @@
         background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
       }
 
-      /* گروه چپ: پرش و شلیک */
+      /* گروه چپ: فلش چپ و فلش راست */
       .ctrl-left {
         display: flex;
         gap: 12px;
         pointer-events: none;
       }
 
-      /* گروه راست: فلش‌های حرکت */
+      /* گروه راست: شلیک و پرش */
       .ctrl-right {
         display: flex;
         gap: 12px;
@@ -320,20 +320,20 @@
 
     <!-- کنترل‌های لمسی سفارشی -->
     <div id="custom-controls">
-      <!-- چپ: شلیک + پرش -->
+      <!-- چپ: فلش چپ ← و فلش راست → -->
       <div class="ctrl-left">
+        <div class="ctrl-btn btn-move" id="btn-left">←</div>
+        <div class="ctrl-btn btn-move" id="btn-right">→</div>
+      </div>
+
+      <!-- راست: شلیک + پرش -->
+      <div class="ctrl-right">
         <div class="ctrl-btn btn-shoot" id="btn-shoot">
           🔧<span>شلیک</span>
         </div>
         <div class="ctrl-btn btn-jump" id="btn-jump">
           ↑<span>پرش</span>
         </div>
-      </div>
-
-      <!-- راست: ← → -->
-      <div class="ctrl-right">
-        <div class="ctrl-btn btn-move" id="btn-left">←</div>
-        <div class="ctrl-btn btn-move" id="btn-right">→</div>
       </div>
     </div>
 
@@ -393,7 +393,6 @@
       // دکمه تنظیمات
       btnSettings.addEventListener('click', () => {
         console.log('تنظیمات باز شد');
-        // اینجا می‌تونی modal تنظیمات را باز کنی
         window.openSettings();
       });
 
