@@ -114,6 +114,79 @@
         50% { opacity: 0.3; }
       }
 
+      /* ===== HUD بالای بازی ===== */
+      #game-hud {
+        position: fixed;
+        top: 8px;
+        left: 0;
+        right: 0;
+        height: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 12px;
+        z-index: 9998;
+        pointer-events: none;
+      }
+
+      /* سمت چپ: مشخصات سیب */
+      .hud-left {
+        display: flex;
+        gap: 16px;
+        pointer-events: none;
+      }
+
+      .hud-stat {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0,0,0,0.4);
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(4px);
+      }
+
+      .hud-stat-icon {
+        font-size: 18px;
+        min-width: 20px;
+      }
+
+      .hud-stat-value {
+        font-family: Tahoma, sans-serif;
+        color: rgba(255,255,255,0.9);
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      /* سمت راست: دکمه تنظیمات */
+      .hud-right {
+        display: flex;
+        pointer-events: all;
+      }
+
+      #btn-settings {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(59,130,246,0.3);
+        border: 2px solid rgba(59,130,246,0.7);
+        color: rgba(59,130,246,0.9);
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 0 12px rgba(59,130,246,0.2);
+        outline: none;
+      }
+
+      #btn-settings:active {
+        transform: scale(0.88);
+        opacity: 0.7;
+      }
+
       /* ===== کنترل‌های لمسی سفارشی ===== */
       #custom-controls {
         position: fixed;
@@ -218,6 +291,33 @@
 
     <div id="root"></div>
 
+    <!-- HUD بالای بازی -->
+    <div id="game-hud">
+      <!-- سمت چپ: مشخصات سیب -->
+      <div class="hud-left">
+        <!-- قلب -->
+        <div class="hud-stat">
+          <div class="hud-stat-icon">❤️</div>
+          <div class="hud-stat-value" id="stat-health">3</div>
+        </div>
+        <!-- سکه -->
+        <div class="hud-stat">
+          <div class="hud-stat-icon">🪙</div>
+          <div class="hud-stat-value" id="stat-coins">0</div>
+        </div>
+        <!-- امتیاز -->
+        <div class="hud-stat">
+          <div class="hud-stat-icon">⭐</div>
+          <div class="hud-stat-value" id="stat-score">0</div>
+        </div>
+      </div>
+
+      <!-- سمت راست: دکمه تنظیمات -->
+      <div class="hud-right">
+        <button id="btn-settings" title="تنظیمات">⚙️</button>
+      </div>
+    </div>
+
     <!-- کنترل‌های لمسی سفارشی -->
     <div id="custom-controls">
       <!-- چپ: شلیک + پرش -->
@@ -266,6 +366,7 @@
       const btnRight = document.getElementById('btn-right');
       const btnJump  = document.getElementById('btn-jump');
       const btnShoot = document.getElementById('btn-shoot');
+      const btnSettings = document.getElementById('btn-settings');
 
       let leftOn = false, rightOn = false, jumpOn = false, shootOn = false;
 
@@ -289,6 +390,16 @@
       btnShoot.addEventListener('touchend',   e => { e.preventDefault(); shootOn=false; key('KeyZ',false); }, {passive:false});
       btnShoot.addEventListener('touchcancel',() => { shootOn=false; key('KeyZ',false); });
 
+      // دکمه تنظیمات
+      btnSettings.addEventListener('click', () => {
+        console.log('تنظیمات باز شد');
+        // اینجا می‌تونی modal تنظیمات را باز کنی
+        window.openSettings();
+      });
+
+      btnSettings.addEventListener('touchstart', e => { e.preventDefault(); });
+      btnSettings.addEventListener('touchend', e => { e.preventDefault(); });
+
       // مخفی کردن کنترل‌های داخلی بازی بعد از لود
       window.addEventListener('load', () => {
         setTimeout(() => {
@@ -305,6 +416,24 @@
       }
       updateSafeArea();
       window.addEventListener('orientationchange', updateSafeArea);
+
+      // ===== تابع‌های به‌روزرسانی HUD =====
+      window.updateHealth = function(value) {
+        document.getElementById('stat-health').textContent = value;
+      }
+
+      window.updateCoins = function(value) {
+        document.getElementById('stat-coins').textContent = value;
+      }
+
+      window.updateScore = function(value) {
+        document.getElementById('stat-score').textContent = value;
+      }
+
+      window.openSettings = function() {
+        console.log('منو تنظیمات باز شد');
+        alert('تنظیمات');
+      }
     </script>
   </body>
 </html>
