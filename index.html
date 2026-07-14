@@ -203,14 +203,14 @@
         background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
       }
 
-      /* گروه چپ: فلش راست و فلش چپ */
+      /* گروه چپ: شلیک و پرش */
       .ctrl-left {
         display: flex;
         gap: 12px;
         pointer-events: none;
       }
 
-      /* گروه راست: شلیک و پرش */
+      /* گروه راست: فلش راست و فلش چپ */
       .ctrl-right {
         display: flex;
         gap: 12px;
@@ -320,20 +320,20 @@
 
     <!-- کنترل‌های لمسی سفارشی -->
     <div id="custom-controls">
-      <!-- چپ: فلش راست → و فلش چپ ← -->
+      <!-- چپ: شلیک و پرش -->
       <div class="ctrl-left">
-        <div class="ctrl-btn btn-move" id="btn-right">→</div>
-        <div class="ctrl-btn btn-move" id="btn-left">←</div>
-      </div>
-
-      <!-- راست: شلیک + پرش -->
-      <div class="ctrl-right">
         <div class="ctrl-btn btn-shoot" id="btn-shoot">
           🔧<span>شلیک</span>
         </div>
         <div class="ctrl-btn btn-jump" id="btn-jump">
           ↑<span>پرش</span>
         </div>
+      </div>
+
+      <!-- راست: فلش راست و فلش چپ -->
+      <div class="ctrl-right">
+        <div class="ctrl-btn btn-move" id="btn-right">→</div>
+        <div class="ctrl-btn btn-move" id="btn-left">←</div>
       </div>
     </div>
 
