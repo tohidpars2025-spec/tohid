@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>برق‌یار گیلان</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        /* حذف safe-area برای دکمه‌های کنترل */
+        padding: 0;
+      }
+
+      #root {
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+      }
+
+      /* مخفی کردن HUD های داخلی بازی */
+      #wrapper {
+        height: 100vh !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #000;
+      }
+      #top-hud { display: none !important; }
+      #grid-neon-monitor { display: none !important; }
+      #bottom-hud { flex-shrink: 0; }
+      #canvas-wrap {
+        flex: 1 !important;
+        position: relative;
+        overflow: hidden;
+        width: 100% !important;
+        background: #000;
+      }
+      #cv {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        max-width: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        display: block;
+      }
+
+      /* ===== صفحه لوگو ===== */
+      #splash-screen {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #0a0a0f;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        transition: opacity 0.8s ease;
+        gap: 20px;
+      }
+      #splash-screen.fade-out { opacity: 0; pointer-events: none; }
+
+      /* اول لوگو T.Games بزرگ */
+      .splash-logo-main img {
+        height: 120px;
+        max-width: 200px;
+        object-fit: contain;
+        animation: pulse 1.5s ease-in-out infinite alternate;
+        filter: drop-shadow(0 0 25px rgba(255,140,0,0.7));
+      }
+
+      /* بعد لوگو توزیع برق گیلان کوچک‌تر */
+      .splash-logo-elec img {
+        height: 75px;
+        max-width: 100px;
+        object-fit: contain;
+        animation: pulse 1.5s ease-in-out infinite alternate;
+        filter: drop-shadow(0 0 15px rgba(255,200,0,0.5));
+        /* حذف پس‌زمینه سفید */
+        mix-blend-mode: screen;
+      }
+
+      /* نام سازمان */
+      .splash-org {
+        color: rgba(255,220,80,0.95);
+        font-size: 16px;
+        font-family: Tahoma, sans-serif;
+        font-weight: bold;
+        text-shadow: 0 0 12px rgba(255,200,0,0.6);
+        letter-spacing: 1px;
+        margin-top: -8px;
+      }
+
+      /* متن انتظار */
+      #splash-screen p {
+        color: rgba(255,255,255,0.5);
+        font-size: 13px;
+        font-family: Tahoma, sans-serif;
+        animation: blink 1s infinite;
+        margin-top: 8px;
+      }
+
+      @keyframes pulse {
+        from { transform: scale(0.95); }
+        to { transform: scale(1.05); }
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+
+      /* ===== کنترل‌های لمسی سفارشی ===== */
+      #custom-controls {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 130px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 30px 15px 25px 15px;
+        z-index: 9999;
+        pointer-events: none;
+        background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+      }
+
+      /* گروه چپ: پرش و شلیک */
+      .ctrl-left {
+        display: flex;
+        gap: 12px;
+        pointer-events: none;
+      }
+
+      /* گروه راست: فلش‌های حرکت */
+      .ctrl-right {
+        display: flex;
+        gap: 12px;
+        pointer-events: none;
+      }
+
+      .ctrl-btn {
+        pointer-events: all;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        transition: transform 0.1s, opacity 0.1s;
+        font-family: Tahoma, sans-serif;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+      .ctrl-btn:active { transform: scale(0.88); opacity: 0.7; }
+
+      /* دکمه شلیک - سبز */
+      .btn-shoot {
+        width: 64px;
+        height: 64px;
+        background: rgba(16,185,129,0.3);
+        border: 2.5px solid rgba(16,185,129,0.7);
+        font-size: 24px;
+        color: rgba(16,185,129,0.9);
+        box-shadow: 0 0 10px rgba(16,185,129,0.3);
+      }
+      .btn-shoot span { font-size: 10px; color: rgba(16,185,129,0.8); font-weight: bold; }
+
+      /* دکمه پرش - آبی */
+      .btn-jump {
+        width: 76px;
+        height: 76px;
+        background: rgba(6,182,212,0.3);
+        border: 2.5px solid rgba(6,182,212,0.7);
+        font-size: 28px;
+        color: rgba(6,182,212,0.9);
+        box-shadow: 0 0 12px rgba(6,182,212,0.3);
+      }
+      .btn-jump span { font-size: 10px; color: rgba(6,182,212,0.8); font-weight: bold; }
+
+      /* دکمه‌های حرکت - خاکستری */
+      .btn-move {
+        width: 64px;
+        height: 64px;
+        background: rgba(100,116,139,0.25);
+        border: 2px solid rgba(100,116,139,0.5);
+        font-size: 26px;
+        color: rgba(255,255,255,0.6);
+        border-radius: 16px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.4);
+      }
+    </style>
+    <script type="module" src="/assets/index-B7Nvxf0m.js"></script>
+    <link rel="stylesheet" href="/assets/index-CViJfaRI.css">
+  </head>
+  <body>
+
+    <!-- صفحه لوگو -->
+    <div id="splash-screen">
+      <!-- اول لوگو T.Games -->
+      <div class="splash-logo-main">
+        <img src="/tgames.png" alt="T.Games" />
+      </div>
+      <!-- بعد لوگو توزیع برق گیلان -->
+      <div class="splash-logo-elec">
+        <img src="/logo-elec.png" alt="توزیع برق گیلان" />
+      </div>
+      <div class="splash-org">توزیع برق گیلان</div>
+      <p>لطفاً کمی صبر کنید...</p>
+    </div>
+
+    <div id="root"></div>
+
+    <!-- کنترل‌های لمسی سفارشی -->
+    <div id="custom-controls">
+      <!-- چپ: شلیک + پرش -->
+      <div class="ctrl-left">
+        <div class="ctrl-btn btn-shoot" id="btn-shoot">
+          🔧<span>شلیک</span>
+        </div>
+        <div class="ctrl-btn btn-jump" id="btn-jump">
+          ↑<span>پرش</span>
+        </div>
+      </div>
+
+      <!-- راست: ← → -->
+      <div class="ctrl-right">
+        <div class="ctrl-btn btn-move" id="btn-left">←</div>
+        <div class="ctrl-btn btn-move" id="btn-right">→</div>
+      </div>
+    </div>
+
+    <script>
+      // ===== splash =====
+      const splash = document.getElementById('splash-screen');
+      let splashDone = false;
+      function hideSplash() {
+        if (splashDone) return;
+        splashDone = true;
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 800);
+      }
+      setTimeout(hideSplash, 4000);
+      splash.addEventListener('touchstart', hideSplash);
+      splash.addEventListener('click', hideSplash);
+
+      // ===== کنترل‌های لمسی =====
+      function key(code, down) {
+        const type = down ? 'keydown' : 'keyup';
+        window.dispatchEvent(new KeyboardEvent(type, {
+          code, bubbles: true, cancelable: true,
+          key: code === 'ArrowLeft' ? 'ArrowLeft'
+             : code === 'ArrowRight' ? 'ArrowRight'
+             : code === 'Space' ? ' ' : 'z'
+        }));
+      }
+
+      const btnLeft  = document.getElementById('btn-left');
+      const btnRight = document.getElementById('btn-right');
+      const btnJump  = document.getElementById('btn-jump');
+      const btnShoot = document.getElementById('btn-shoot');
+
+      let leftOn = false, rightOn = false, jumpOn = false, shootOn = false;
+
+      // فلش چپ
+      btnLeft.addEventListener('touchstart', e => { e.preventDefault(); if(!leftOn){leftOn=true; key('ArrowLeft',true);} }, {passive:false});
+      btnLeft.addEventListener('touchend',   e => { e.preventDefault(); leftOn=false; key('ArrowLeft',false); }, {passive:false});
+      btnLeft.addEventListener('touchcancel',() => { leftOn=false; key('ArrowLeft',false); });
+
+      // فلش راست
+      btnRight.addEventListener('touchstart', e => { e.preventDefault(); if(!rightOn){rightOn=true; key('ArrowRight',true);} }, {passive:false});
+      btnRight.addEventListener('touchend',   e => { e.preventDefault(); rightOn=false; key('ArrowRight',false); }, {passive:false});
+      btnRight.addEventListener('touchcancel',() => { rightOn=false; key('ArrowRight',false); });
+
+      // پرش
+      btnJump.addEventListener('touchstart', e => { e.preventDefault(); if(!jumpOn){jumpOn=true; key('Space',true);} }, {passive:false});
+      btnJump.addEventListener('touchend',   e => { e.preventDefault(); jumpOn=false; key('Space',false); }, {passive:false});
+      btnJump.addEventListener('touchcancel',() => { jumpOn=false; key('Space',false); });
+
+      // شلیک
+      btnShoot.addEventListener('touchstart', e => { e.preventDefault(); if(!shootOn){shootOn=true; key('KeyZ',true);} }, {passive:false});
+      btnShoot.addEventListener('touchend',   e => { e.preventDefault(); shootOn=false; key('KeyZ',false); }, {passive:false});
+      btnShoot.addEventListener('touchcancel',() => { shootOn=false; key('KeyZ',false); });
+
+      // مخفی کردن کنترل‌های داخلی بازی بعد از لود
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const internalHud = document.getElementById('bottom-hud');
+          if (internalHud) internalHud.style.display = 'none';
+        }, 2000);
+      });
+
+      // اضافه کردن padding‌های safe-area بر اساس دستگاه
+      function updateSafeArea() {
+        const controls = document.getElementById('custom-controls');
+        const bottom = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom') || '0px';
+        controls.style.paddingBottom = 'calc(25px + ' + bottom + ')';
+      }
+      updateSafeArea();
+      window.addEventListener('orientationchange', updateSafeArea);
+    </script>
+  </body>
+</html>
